@@ -1,26 +1,19 @@
-import unittest
-from main import remainder
+import pytest
+from main import get_random_cat_image
 
-class TestRemainder(unittest.TestCase):
-    def test_positive_numbers(self):
-        self.assertEqual(remainder(32, 5), 2)
+def test_get_random_cat_image_success(mocker):
+    mock_get = mocker.patch('main.requests.get')
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = [{'url': 'https://cdn2.thecatapi.com/images/xyz.jpg'}]
 
-    def test_negative_dividend(self):
-        self.assertEqual(remainder(54, 8), 6)
+    url = get_random_cat_image()
+    assert url == 'https://cdn2.thecatapi.com/images/xyz.jpg'
 
-    def test_negative_divisor(self):
-        self.assertEqual(remainder(25, 4), 1)
+def test_get_random_cat_image_error(mocker):
+    mock_get = mocker.patch('main.requests.get')
+    mock_get.return_value.status_code = 404
 
-    def test_both_negative(self):
-        self.assertEqual(remainder(44, 7), 2)
+    url = get_random_cat_image()
+    assert url is None
 
-    def test_zero_dividend(self):
-        self.assertEqual(remainder(0, 7), 0)
-
-    def test_division_by_zero(self):
-        with self.assertRaises(ZeroDivisionError):
-            remainder(14, 0)
-
-if __name__ == '__main__':
-    unittest.main()
 
